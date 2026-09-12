@@ -34,6 +34,23 @@ export async function GET(
     const authUrl =
       getGoogleAuthUrl(state);
 
+    const authUrlObject =
+      new URL(authUrl);
+
+    console.info(
+      "[gmail oauth] Production authorization configuration:",
+      {
+        clientId:
+          authUrlObject.searchParams.get(
+            "client_id"
+          ),
+        redirectUri:
+          authUrlObject.searchParams.get(
+            "redirect_uri"
+          ),
+      }
+    );
+
     return NextResponse.redirect(
       authUrl
     );
