@@ -15,6 +15,9 @@ import {
 import {
   parseIncomingWhatsAppTextMessage,
 } from "@/lib/whatsapp/parseIncomingMessage";
+import {
+  transcribeWhatsAppAudio,
+} from "@/lib/whatsappTranscription";
 import { handleForwardedSms } from "@/lib/handlers/smsForward";
 import {
   handlePendingReceiptReply,
@@ -22,6 +25,7 @@ import {
 } from "@/lib/handlers/receiptOcr";
 import {
   downloadWhatsAppMedia,
+  downloadWhatsAppMediaWithMetadata,
 } from "@/lib/whatsappMedia";
 import {
   sendWhatsAppMessage,
@@ -341,6 +345,119 @@ export async function POST(
           status: "duplicate",
         });
       }
+    }
+
+    if (messageType === "audio") {
+      const audioPayload =
+        incomingMessage.audio;
+
+      const audioObject =
+        audioPayload &&
+        typeof audioPayload === "object"
+          ? (audioPayload as Record<
+              string,
+              unknown
+            >)
+          : null;
+
+      const mediaId =
+        typeof audioObject?.id ===
+        "string"
+          ? audioObject.id.trim()
+          : "";
+
+      if (!mediaId) {
+        await sendWhatsAppMessage(
+          from,
+          "I received your voice note, but I couldn't access the audio."
+        );
+
+        return NextResponse.json({
+          status: "invalid_audio",
+        });
+      }
+
+      const audio =
+        await downloadWhatsAppMediaWithMetadata(
+          mediaId
+        );
+
+      if (!audio) {
+        await sendWhatsAppMessage(
+          from,
+          "I received your voice note, but I couldn't download the audio. Please try again."
+        );
+
+        return NextResponse.json({
+          status: "audio_download_failed",
+        });
+      }
+
+      const text =
+        await transcribeWhatsAppAudio(
+          audio.buffer,
+          audio.mimeType
+        );
+
+      if (!text) {
+        await sendWhatsAppMessage(
+          from,
+          "I couldn't understand that voice note. Please try speaking again or send the message as text."
+        );
+
+        return NextResponse.json({
+          status: "transcription_failed",
+        });
+      }
+
+      console.info(
+        `[whatsapp webhook] Transcribed voice note from ${from}: ${text}`
+      );
+
+      await prisma.whatsAppMessage.create({
+        data: {
+          userId: user.id,
+          messageId,
+          direction: "inbound",
+          messageType: "audio",
+          body: text,
+          sentAt,
+        },
+      });
+
+      const pendingReceiptReply =
+        await handlePendingReceiptReply(
+          user.id,
+          text
+        );
+
+      const parsed =
+        parseCommand(text);
+
+      const reply =
+        pendingReceiptReply ??
+        (
+          parsed
+            ? await routeCommand(
+                user.id,
+                parsed
+              )
+            : await handleForwardedSms(
+                user.id,
+                text
+              )
+        );
+
+      await sendWhatsAppMessage(
+        from,
+        reply
+      );
+
+      return NextResponse.json({
+        status: "ok",
+        type: "audio",
+        transcript: text,
+      });
     }
 
     if (messageType === "image") {
