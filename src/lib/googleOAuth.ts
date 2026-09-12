@@ -152,14 +152,53 @@ export function verifyGmailOAuthState(
   }
 }
 
+function getGoogleClientId(): string {
+  return (
+    process.env.GOOGLE_CLIENT_ID ??
+    process.env.AUTH_GOOGLE_ID ??
+    ""
+  );
+}
+
+function getGoogleClientSecret(): string {
+  return (
+    process.env.GOOGLE_CLIENT_SECRET ??
+    process.env.AUTH_GOOGLE_SECRET ??
+    ""
+  );
+}
+
+function getGoogleRedirectUri(): string {
+  return (
+    process.env.GOOGLE_REDIRECT_URI ??
+    `${process.env.APP_BASE_URL ?? "https://minderra.onrender.com"}/api/auth/gmail/callback`
+  );
+}
+
 export function getGmailAuthUrl(
   state: string
 ): string {
+  const clientId =
+    getGoogleClientId();
+
+  const redirectUri =
+    getGoogleRedirectUri();
+
+  if (!clientId) {
+    throw new Error(
+      "Google OAuth client ID is not configured."
+    );
+  }
+
+  if (!redirectUri) {
+    throw new Error(
+      "Google OAuth redirect URI is not configured."
+    );
+  }
+
   const params = new URLSearchParams({
-    client_id:
-      process.env.GOOGLE_CLIENT_ID ?? "",
-    redirect_uri:
-      process.env.GOOGLE_REDIRECT_URI ?? "",
+    client_id: clientId,
+    redirect_uri: redirectUri,
     response_type: "code",
     scope: GMAIL_SCOPE,
     access_type: "offline",
@@ -196,11 +235,11 @@ export async function exchangeCodeForTokens(
       body: new URLSearchParams({
         code,
         client_id:
-          process.env.GOOGLE_CLIENT_ID ?? "",
+          getGoogleClientId(),
         client_secret:
-          process.env.GOOGLE_CLIENT_SECRET ?? "",
+          getGoogleClientSecret(),
         redirect_uri:
-          process.env.GOOGLE_REDIRECT_URI ?? "",
+          getGoogleRedirectUri(),
         grant_type:
           "authorization_code",
       }),
@@ -254,9 +293,9 @@ export async function refreshAccessToken(
       body: new URLSearchParams({
         refresh_token: refreshToken,
         client_id:
-          process.env.GOOGLE_CLIENT_ID ?? "",
+          getGoogleClientId(),
         client_secret:
-          process.env.GOOGLE_CLIENT_SECRET ?? "",
+          getGoogleClientSecret(),
         grant_type: "refresh_token",
       }),
     }
