@@ -10,3 +10,4 @@ prisma/dev.db-journal
 eng.traineddata
 tsconfig.tsbuildinfo
 .env.backup
+.local-db-backups/
