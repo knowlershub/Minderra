@@ -146,8 +146,18 @@ export const {
         process.env.AUTH_GOOGLE_ID ??
         process.env.GOOGLE_CLIENT_ID ??
         "",
+
       clientSecret:
-        process.env.AUTH_GOOGLE_SECRET ?? "",
+        process.env.AUTH_GOOGLE_SECRET ??
+        process.env.GOOGLE_CLIENT_SECRET ??
+        "",
+
+      authorization: {
+        params: {
+          prompt: "select_account",
+          scope: "openid email profile",
+        },
+      },
     }),
 
     Credentials({
@@ -231,25 +241,38 @@ export const {
         return true;
       }
 
-      if (
-        !user.email ||
-        !account.providerAccountId
-      ) {
+      const email = user.email
+        ? normalizeEmail(user.email)
+        : "";
+
+      const providerAccountId =
+        account.providerAccountId?.trim() ?? "";
+
+      if (!email || !providerAccountId) {
+        console.error(
+          "[Google sign-in] Missing required identity data:",
+          {
+            provider: account.provider,
+            hasEmail: Boolean(email),
+            hasProviderAccountId:
+              Boolean(providerAccountId),
+          }
+        );
+
         return false;
       }
 
       const dbUser =
         await findOrCreateOAuthUser({
-          email: user.email,
+          email,
           name: user.name,
           provider: account.provider,
-          providerAccountId:
-            account.providerAccountId,
+          providerAccountId,
         });
 
       user.id = dbUser.id;
       user.name = dbUser.displayName;
-      user.email = normalizeEmail(user.email);
+      user.email = email;
 
       return true;
     },
