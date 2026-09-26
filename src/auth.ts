@@ -249,6 +249,13 @@ export const {
         account.providerAccountId?.trim() ?? "";
 
       if (!email || !providerAccountId) {
+        const missing = [
+          !email ? "email" : null,
+          !providerAccountId ? "providerAccountId" : null,
+        ]
+          .filter(Boolean)
+          .join(",");
+
         console.error(
           "[Google sign-in] Missing required identity data:",
           {
@@ -259,7 +266,13 @@ export const {
           }
         );
 
-        return false;
+        const baseUrl =
+          process.env.APP_BASE_URL ??
+          "http://localhost:3000";
+
+        return `${baseUrl}/login?error=google_identity_missing&missing=${encodeURIComponent(
+          missing
+        )}`;
       }
 
       const dbUser =
