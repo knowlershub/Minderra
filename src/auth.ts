@@ -275,19 +275,54 @@ export const {
         )}`;
       }
 
-      const dbUser =
-        await findOrCreateOAuthUser({
-          email,
-          name: user.name,
-          provider: account.provider,
-          providerAccountId,
-        });
+      try {
+        console.log(
+          "[Google sign-in] Starting database user lookup/creation."
+        );
 
-      user.id = dbUser.id;
-      user.name = dbUser.displayName;
-      user.email = email;
+        const dbUser =
+          await findOrCreateOAuthUser({
+            email,
+            name: user.name,
+            provider: account.provider,
+            providerAccountId,
+          });
 
-      return true;
+        user.id = dbUser.id;
+        user.name = dbUser.displayName;
+        user.email = email;
+
+        console.log(
+          "[Google sign-in] Database user lookup/creation succeeded."
+        );
+
+        return true;
+      } catch (error) {
+        const maybeError = error as {
+          name?: unknown;
+          message?: unknown;
+          code?: unknown;
+          meta?: unknown;
+          stack?: unknown;
+        };
+
+        console.error(
+          "[Google sign-in] Database/user provisioning failed.",
+          {
+            name: maybeError.name,
+            message: maybeError.message,
+            code: maybeError.code,
+            meta: maybeError.meta,
+            stack: maybeError.stack,
+          }
+        );
+
+        const baseUrl =
+          process.env.APP_BASE_URL ??
+          "http://localhost:3000";
+
+        return `${baseUrl}/login?error=google_database`;
+      }
     },
 
     async jwt({
