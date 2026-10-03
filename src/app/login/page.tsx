@@ -98,7 +98,7 @@ export default function LoginPage() {
     setGoogleLoading(true);
 
     window.location.href =
-      "/api/signin/google?callbackUrl=%2Fdashboard";
+      "/api/auth/signin/google?callbackUrl=%2Fdashboard";
   }
 
   return (
