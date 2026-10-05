@@ -93,12 +93,13 @@ export default function LoginPage() {
     }
   }
 
-  function handleGoogleSignIn() {
+  async function handleGoogleSignIn() {
     setError(null);
     setGoogleLoading(true);
 
-    window.location.href =
-      "/api/auth/signin/google?callbackUrl=%2Fdashboard";
+    await signIn("google", {
+      redirectTo: "/dashboard",
+    });
   }
 
   return (
