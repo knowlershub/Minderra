@@ -325,7 +325,7 @@ export const {
       }
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user?.id) {
         token.userId = user.id;
       }
@@ -334,14 +334,30 @@ export const {
         user?.email ?? token.email ?? ""
       ).trim().toLowerCase();
 
+      if (account?.provider) {
+        token.authProvider = account.provider;
+      }
+
       const ownerEmail = (
         process.env.MINDERRA_OWNER_EMAIL ??
         "knowlershub@gmail.com"
       ).trim().toLowerCase();
 
-      token.isOwner = Boolean(
+      const adminEmails = new Set(
+        (process.env.MINDERRA_ADMIN_EMAILS ?? "")
+          .split(",")
+          .map((value) => value.trim().toLowerCase())
+          .filter(Boolean)
+      );
+
+      const isOwner = Boolean(
         email && ownerEmail && email === ownerEmail
       );
+
+      token.isOwner = isOwner;
+      token.isAdmin =
+        isOwner ||
+        (token.authProvider === "google" && adminEmails.has(email));
 
       return token;
     },
@@ -353,6 +369,7 @@ export const {
         }
 
         session.user.isOwner = token.isOwner === true;
+        session.user.isAdmin = token.isAdmin === true;
       }
 
       return session;

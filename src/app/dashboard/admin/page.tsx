@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getOwnerSession } from "@/lib/owner";
+import { getAdminSession } from "@/lib/owner";
 import { prisma } from "@/lib/prisma";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileNav from "@/components/layout/MobileNav";
@@ -9,7 +9,7 @@ import MobileNav from "@/components/layout/MobileNav";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const ownerSession = await getOwnerSession();
+  const ownerSession = await getAdminSession();
 
   if (!ownerSession) {
     redirect("/dashboard");
@@ -44,7 +44,7 @@ export default async function AdminPage() {
           <header className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-amber-700">
-                Website Owner
+                {ownerSession.user.isOwner ? "Website Owner" : "Administrator"}
               </p>
               <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">
                 Administration

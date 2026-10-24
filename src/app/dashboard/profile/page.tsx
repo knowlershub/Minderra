@@ -204,11 +204,15 @@ const freshData = await getDashboardData();
                             Account active
                           </span>
 
-                          {session?.user?.isOwner === true && (
+                          {session?.user?.isOwner === true ? (
                             <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
                               Website Owner
                             </span>
-                          )}
+                          ) : session?.user?.isAdmin === true ? (
+                            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
+                              Administrator
+                            </span>
+                          ) : null}
 
                         </div>
                       </div>

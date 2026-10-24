@@ -206,6 +206,19 @@ export default function HomePage() {
           <Link href="/terms" style={{ color: "inherit" }}>
             Terms of Service
           </Link>
+
+          <a
+            href="https://t.me/+ZWWQ5O-a0c9lNDU0"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#0369a1",
+              textDecoration: "none",
+              fontWeight: 700,
+            }}
+          >
+            Join our Telegram Community ↗
+          </a>
         </footer>
       </div>
     </main>

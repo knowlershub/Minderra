@@ -9,6 +9,9 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       isOwner?: boolean;
+    isAdmin?: boolean;
+    authProvider?: string;
+      isAdmin?: boolean;
     };
   }
 }
