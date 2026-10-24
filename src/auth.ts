@@ -325,28 +325,34 @@ export const {
       }
     },
 
-    async jwt({
-      token,
-      user,
-    }) {
+    async jwt({ token, user }) {
       if (user?.id) {
         token.userId = user.id;
       }
 
+      const email = String(
+        user?.email ?? token.email ?? ""
+      ).trim().toLowerCase();
+
+      const ownerEmail = (
+        process.env.MINDERRA_OWNER_EMAIL ??
+        "knowlershub@gmail.com"
+      ).trim().toLowerCase();
+
+      token.isOwner = Boolean(
+        email && ownerEmail && email === ownerEmail
+      );
+
       return token;
     },
 
-    async session({
-      session,
-      token,
-    }) {
-      if (
-        session.user &&
-        token.userId
-      ) {
-        session.user.id = String(
-          token.userId
-        );
+    async session({ session, token }) {
+      if (session.user) {
+        if (token.userId) {
+          session.user.id = String(token.userId);
+        }
+
+        session.user.isOwner = token.isOwner === true;
       }
 
       return session;

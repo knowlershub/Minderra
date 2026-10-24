@@ -44,8 +44,22 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const {
+    data: session,
     status: sessionStatus,
   } = useSession();
+
+  const isOwner = session?.user?.isOwner === true;
+
+  const visibleNavigation = isOwner
+    ? [
+        ...navigation,
+        {
+          label: "Administration",
+          href: "/dashboard/admin",
+          icon: "⚙",
+        },
+      ]
+    : navigation;
 
   const [gmailConnected, setGmailConnected] =
     useState(false);
@@ -103,6 +117,11 @@ export default function Sidebar() {
             <div className="text-xs text-slate-400">
               Life OS
             </div>
+            {isOwner && (
+              <div className="mt-1 text-xs font-semibold text-amber-300">
+                Website Owner
+              </div>
+            )}
           </div>
         </Link>
       </div>
@@ -113,7 +132,7 @@ export default function Sidebar() {
         </div>
 
         <nav className="space-y-1">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const active =
               item.href === "/dashboard"
                 ? pathname === "/dashboard"

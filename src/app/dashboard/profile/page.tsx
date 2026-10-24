@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import Sidebar from "@/components/layout/Sidebar";
 import MobileNav from "@/components/layout/MobileNav";
@@ -11,6 +12,8 @@ import {
 } from "@/lib/dashboardApi";
 
 export default function ProfilePage() {
+  const { data: session } = useSession();
+
   const [data, setData] = useState<DashboardData | null>(null);
 
   const [displayName, setDisplayName] = useState("");
@@ -201,9 +204,12 @@ const freshData = await getDashboardData();
                             Account active
                           </span>
 
-                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                            Test environment
-                          </span>
+                          {session?.user?.isOwner === true && (
+                            <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
+                              Website Owner
+                            </span>
+                          )}
+
                         </div>
                       </div>
                     </div>
