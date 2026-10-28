@@ -194,15 +194,30 @@ export default function Sidebar() {
           href="https://t.me/+ZWWQ5O-a0c9lNDU0"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Join the Minderra Telegram Community (opens in a new tab)"
+          aria-label="Join the Minderra Telegram Channel (opens in a new tab)"
           className="block rounded-xl border border-sky-400/20 bg-sky-400/10 px-3 py-3 transition hover:bg-sky-400/15"
         >
           <span className="flex items-center gap-2 text-sm font-semibold text-sky-200">
             <span aria-hidden="true">➤</span>
-            Join our community ↗
+            Telegram Channel ↗
           </span>
           <span className="mt-1 block text-xs leading-5 text-slate-400">
-            Minderra news, updates and discussions
+            Official announcements and updates
+          </span>
+        </a>
+        <a
+          href="https://t.me/+b_Dor8mCa74wODhk"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Join the Minderra Community Group (opens in a new tab)"
+          className="mt-2 block rounded-xl border border-sky-400/20 bg-sky-400/10 px-3 py-3 transition hover:bg-sky-400/15"
+        >
+          <span className="flex items-center gap-2 text-sm font-semibold text-sky-200">
+            <span aria-hidden="true">💬</span>
+            Community Group ↗
+          </span>
+          <span className="mt-1 block text-xs leading-5 text-slate-400">
+            Chat with other Minderra users
           </span>
         </a>
       </div>

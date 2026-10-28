@@ -217,7 +217,20 @@ export default function HomePage() {
               fontWeight: 700,
             }}
           >
-            Join our Telegram Community ↗
+            Telegram Channel ↗
+          </a>
+
+          <a
+            href="https://t.me/+b_Dor8mCa74wODhk"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#0369a1",
+              textDecoration: "none",
+              fontWeight: 700,
+            }}
+          >
+            Community Group ↗
           </a>
         </footer>
       </div>
